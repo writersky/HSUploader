@@ -4,7 +4,7 @@
 /* @author  Harris Wong                                                 */
 /* @date    May 5th, 2013                                               */
 /************************************************************************/
-// $Id: Heartstring.js 195 2012-07-07 22:57:41Z harris $
+
 Heartstring.HSUploader = Heartstring.HSUploader || {};
 
 /**
@@ -15,25 +15,38 @@ Heartstring.HSUploader = function (container, config) {
     that.container = container;
     
     /**
+     * Handle uploads from drag and drop/file select, then fire ajax to upload file.
+     * @param   Object      $that   
+     * @param   Array       $files      The FileUpload object list from browser.
+     */
+    that.handleUploads = function (that, files) {
+        var formData = new FormData();
+        formData.append('file', files[0]);
+        formData.append('token', Heartstring.select(that.config.selectors.token).val());
+        
+        $.ajax({
+            url: that.config.uploadReceiver,
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST'
+        }).done(function(data) {
+            console.log(data);
+            Heartstring.select(that.container).removeClass(that.config.styles.dragenter);
+            Heartstring.select(that.config.selectors.token).val(data.token);
+        });
+    }
+    
+    /**
      * Bind toggler
      */
     that.bindDrop = function (that) {
         Heartstring.select(that.container).bind('drop', function(e) {
             //TODO: Disable dropbox
             e.preventDefault();
-            var formData = new FormData();
-            formData.append('file', e.originalEvent.dataTransfer.files[0]);
-            
-            $.ajax({
-                url: that.config.uploadReceiver,
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                type: 'POST'
-            }).done(function(data) {
-                Heartstring.select(that.container).removeClass(that.config.styles.dragenter);
-            });
+            console.log(e, e.originalEvent.dataTransfer);
+            that.handleUploads(that, e.originalEvent.dataTransfer.files);
         });
     };
     
@@ -51,6 +64,7 @@ Heartstring.HSUploader = function (container, config) {
      */
     that.bindDragEnter = function (that) {
         Heartstring.select(that.container).bind('dragenter', function(e) {
+        console.log('drag enter', e);
             Heartstring.select(that.container).addClass(that.config.styles.dragenter);
         });
     };
@@ -59,10 +73,20 @@ Heartstring.HSUploader = function (container, config) {
      */
     that.bindDragLeave = function (that) {
         Heartstring.select(that.container).bind('dragleave dragend', function(e) {
+        console.log('drag leave', e);
             Heartstring.select(that.container).removeClass(that.config.styles.dragenter);
         });
     };
     
+    /**
+     * Bind the <input type="file"> uploader
+     */
+    that.bindFileInput = function (that) {
+        Heartstring.select(that.config.selectors.fileUploadInput).bind('change', function(e) {
+            console.log('upload manually', e);
+            that.handleUploads(that, e.target.files);
+        });
+    };
     return that;
 }
 
@@ -82,6 +106,7 @@ Heartstring.HSUploader.bind = function(that) {
     that.bindDragOver(that);
     that.bindDragEnter(that);
     that.bindDragLeave(that);
+    that.bindFileInput(that);
 }
 
 //default settings for this component
@@ -89,6 +114,8 @@ Heartstring.HSUploader.defaults = {
     container: "ws-upload",
     config: {
         selectors: {
+            token: '',
+            fileUploadInput: ''
         },
         styles: {
             dragenter: 'ws-uploader-dragenter'
