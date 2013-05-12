@@ -37,7 +37,6 @@ Heartstring.HSUploader = function (container, config) {
             processData: false,
             type: 'POST'
         }).done(function(response) {
-            console.log(response);
             Heartstring.select(that.container).removeClass(that.config.styles.dragenter);
             Heartstring.select(that.config.selectors.token).val(response.token);
             //Handle user defined function.
@@ -52,7 +51,6 @@ Heartstring.HSUploader = function (container, config) {
         Heartstring.select(that.container).bind('drop', function(e) {
             //TODO: Disable dropbox
             e.preventDefault();
-            console.log(e, e.originalEvent.dataTransfer);
             that.handleUploads(that, e.originalEvent.dataTransfer.files);
         });
     };
@@ -71,7 +69,6 @@ Heartstring.HSUploader = function (container, config) {
      */
     that.bindDragEnter = function (that) {
         Heartstring.select(that.container).bind('dragenter', function(e) {
-        console.log('drag enter', e);
             Heartstring.select(that.container).addClass(that.config.styles.dragenter);
         });
     };
@@ -80,7 +77,6 @@ Heartstring.HSUploader = function (container, config) {
      */
     that.bindDragLeave = function (that) {
         Heartstring.select(that.container).bind('dragleave dragend', function(e) {
-        console.log('drag leave', e);
             Heartstring.select(that.container).removeClass(that.config.styles.dragenter);
         });
     };
@@ -90,7 +86,6 @@ Heartstring.HSUploader = function (container, config) {
      */
     that.bindFileInput = function (that) {
         Heartstring.select(that.config.selectors.fileUploadInput).bind('change', function(e) {
-            console.log('upload manually', e);
             that.handleUploads(that, e.target.files);
         });
     };
