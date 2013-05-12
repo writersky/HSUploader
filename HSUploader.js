@@ -21,7 +21,12 @@ Heartstring.HSUploader = function (container, config) {
      */
     that.handleUploads = function (that, files) {
         var formData = new FormData();
-        formData.append('file', files[0]);
+        for (var i = 0, file; file = files[i]; i++) {
+            /* Although we can do files[0], but Firefox will give us permission denied.
+             * we need to go through its iterator to retrieve the info.
+             */
+            formData.append('file', file);
+        }
         formData.append('token', Heartstring.select(that.config.selectors.token).val());
         
         $.ajax({
