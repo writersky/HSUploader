@@ -31,10 +31,12 @@ Heartstring.HSUploader = function (container, config) {
             contentType: false,
             processData: false,
             type: 'POST'
-        }).done(function(data) {
-            console.log(data);
+        }).done(function(response) {
+            console.log(response);
             Heartstring.select(that.container).removeClass(that.config.styles.dragenter);
-            Heartstring.select(that.config.selectors.token).val(data.token);
+            Heartstring.select(that.config.selectors.token).val(response.token);
+            //Handle user defined function.
+            that.config.callback(that, response);
         });
     }
     
@@ -120,6 +122,7 @@ Heartstring.HSUploader.defaults = {
         styles: {
             dragenter: 'ws-uploader-dragenter'
         },
-        uploadReceiver: ''
+        uploadReceiver: '',
+        callback: function(that, response){}
     }
 };
